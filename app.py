@@ -2,7 +2,7 @@
 Internal Backlink Analyzer for Ghost CMS
 Discover internal linking opportunities based on Ghost CMS tags and content relationships.
 
-Author: Your Name
+Author: Madusanka Premaratne
 License: MIT
 """
 
@@ -70,7 +70,7 @@ st.markdown("**For Ghost CMS** • Discover internal linking opportunities based
 
 def fetch_sitemap(sitemap_url: str) -> List[str]:
     """
-    Fetch URLs from sitemap.xml
+    Fetch URLs from sitemap.xml with robust error handling for malformed XML
     
     Args:
         sitemap_url: URL to the sitemap.xml file
@@ -81,19 +81,63 @@ def fetch_sitemap(sitemap_url: str) -> List[str]:
     try:
         response = requests.get(sitemap_url, timeout=10)
         response.raise_for_status()
-        root = ET.fromstring(response.content)
+        
+        # Try to parse as XML
+        try:
+            root = ET.fromstring(response.content)
+        except ET.ParseError as e:
+            # If XML parsing fails, try to fix common issues
+            content = response.text
+            
+            # Try to fix common XML issues
+            st.warning(f"⚠️ XML parsing error on line {e.position[0]}: {e.msg}")
+            st.info("Attempting to recover from malformed XML...")
+            
+            # Try removing invalid characters or fixing common issues
+            try:
+                # Try parsing with error recovery
+                from xml.etree.ElementTree import XMLParser
+                parser = XMLParser()
+                parser.entity = {}
+                root = ET.fromstring(content)
+            except:
+                # Last attempt: extract URLs with regex
+                import re
+                urls = re.findall(r'<loc>(https?://[^<]+)</loc>', content)
+                if urls:
+                    st.success(f"✅ Recovered {len(urls)} URLs using pattern matching")
+                    return urls
+                else:
+                    st.error(f"❌ Could not parse sitemap. Error: {e.msg} at line {e.position[0]}, column {e.position[1]}")
+                    return []
         
         # Handle namespace
         namespace = {'ns': 'http://www.sitemaps.org/schemas/sitemap/0.9'}
-        urls = [loc.text for loc in root.findall('.//ns:loc', namespace)]
+        urls = [loc.text for loc in root.findall('.//ns:loc', namespace) if loc.text]
         
         # Try without namespace if empty
         if not urls:
-            urls = [loc.text for loc in root.findall('.//loc')]
+            urls = [loc.text for loc in root.findall('.//loc') if loc.text]
+        
+        # Filter out None and empty values
+        urls = [url for url in urls if url]
+        
+        if urls:
+            st.success(f"✅ Successfully fetched {len(urls)} URLs from sitemap")
         
         return urls
+        
+    except requests.exceptions.Timeout:
+        st.error("❌ Timeout: Sitemap took too long to load (>10 seconds)")
+        return []
+    except requests.exceptions.ConnectionError:
+        st.error("❌ Connection Error: Could not reach the sitemap URL")
+        return []
+    except requests.exceptions.RequestException as e:
+        st.error(f"❌ Request Error: {e}")
+        return []
     except Exception as e:
-        st.error(f"❌ Error fetching sitemap: {e}")
+        st.error(f"❌ Unexpected error: {str(e)}")
         return []
 
 
