@@ -685,9 +685,9 @@ with st.sidebar.expander("📚 Learn More"):
 st.sidebar.markdown("---")
 st.sidebar.markdown("""
 <div style="text-align: center; font-size: 0.8em; color: #666;">
-<p><strong>Internal Backlink Analyzer</strong></p>
+<p><strong>Internal Backlink Analyzer | Knovik | Madusanka Premaratne</strong></p>
 <p>Built for Ghost CMS</p>
-<p><a href="https://github.com/yourusername/backlink-analyzer-ghost" target="_blank">GitHub</a> • 
+<p><a href="https://github.com/KnovikLLC/ghost-backlink-analyzer-python" target="_blank">GitHub Repo</a> • 
 <a href="#" target="_blank">Docs</a></p>
 </div>
 """, unsafe_allow_html=True)
