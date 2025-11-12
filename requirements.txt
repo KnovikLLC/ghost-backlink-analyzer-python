@@ -1,15 +1,8 @@
-# Core dependencies - Python 3.13 compatible
-streamlit>=1.28.0,<1.29.0
-requests>=2.31.0,<3.0.0
-beautifulsoup4>=4.12.0,<5.0.0
-pandas>=2.1.0,<2.2.0
-
-# Use lxml-html-clean instead of lxml for better compatibility
-# Or skip lxml entirely as BeautifulSoup can use html.parser
-
-# Scientific computing dependencies
-numpy>=1.24.0,<2.0.0
-scikit-learn>=1.3.0,<1.5.0
-
-# Optional but recommended
-python-dateutil>=2.8.0,<3.0.0
+streamlit>=1.30.0
+requests>=2.32.0
+beautifulsoup4>=4.14.0
+pandas>=2.2.3
+scikit-learn>=1.5.2
+lxml>=5.2.0
+numpy>=2.0.1
+setuptools>=69.0
